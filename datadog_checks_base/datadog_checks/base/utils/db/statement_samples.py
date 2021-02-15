@@ -39,8 +39,9 @@ def _chunks(items, n):
 
 def _new_api_session(api_key):
     http = requests.Session()
-    http.mount("https://",
-               HTTPAdapter(max_retries=Retry(connect=2, read=2, redirect=2, status=2, method_whitelist=['POST'])))
+    http.mount(
+        "https://", HTTPAdapter(max_retries=Retry(connect=2, read=2, redirect=2, status=2, method_whitelist=['POST']))
+    )
     http.headers.update({'DD-API-KEY': api_key})
     return http
 
@@ -74,8 +75,11 @@ def _load_event_endpoints_from_config(config_prefix, default_url):
         api_key, host = additional_endpoint.get('api_key'), additional_endpoint.get('host')
         missing_keys = [k for k, v in [('api_key', api_key), ('host', host)] if not v]
         if missing_keys:
-            logger.warning("invalid event endpoint found in %s.additional_endpoints. missing required keys %s",
-                           config_prefix, ', '.join(missing_keys))
+            logger.warning(
+                "invalid event endpoint found in %s.additional_endpoints. missing required keys %s",
+                config_prefix,
+                ', '.join(missing_keys),
+            )
             continue
         url = _event_intake_url(host)
         endpoints.append((_new_api_session(api_key), url))
@@ -98,10 +102,13 @@ class StatementSamplesClient:
         for chunk in _chunks(events, 100):
             for http, url in self._endpoints:
                 try:
-                    r = http.request('post', url,
-                                     data=json.dumps(chunk, cls=EventEncoder),
-                                     timeout=5,
-                                     headers={'Content-Type': 'application/json'})
+                    r = http.request(
+                        'post',
+                        url,
+                        data=json.dumps(chunk, cls=EventEncoder),
+                        timeout=5,
+                        headers={'Content-Type': 'application/json'},
+                    )
                     r.raise_for_status()
                     logger.debug("Submitted %s statement samples to %s", len(chunk), url)
                     submitted_count += len(chunk)

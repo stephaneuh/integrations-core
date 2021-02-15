@@ -6,8 +6,6 @@ import socket
 import time
 from itertools import chain
 
-import pytz
-
 try:
     import datadog_agent
 except ImportError:
@@ -31,11 +29,9 @@ SUBMISSION_METHODS = {
 
 
 def create_submission_transformer(submit_method):
-
     # During the compilation phase every transformer will have access to all the others and may be
     # passed the first arguments (e.g. name) that will be forwarded the actual AgentCheck methods.
     def get_transformer(_transformers, *creation_args, **modifiers):
-
         # The first argument of every transformer is a map of named references to collected values.
         def transformer(_sources, *call_args, **kwargs):
             kwargs.update(modifiers)
@@ -64,15 +60,6 @@ def create_extra_transformer(column_transformer, source=None):
         transformer = column_transformer
 
     return transformer
-
-
-def normalize_datetime(dt):
-    # Prevent naive datetime objects
-    if dt.tzinfo is None:
-        # The stdlib datetime.timezone.utc doesn't work properly on Windows
-        dt = dt.replace(tzinfo=pytz.utc)
-
-    return dt
 
 
 class ConstantRateLimiter:
@@ -107,8 +94,12 @@ def resolve_db_host(db_host):
         host_ip = socket.gethostbyname(db_host)
     except socket.gaierror as e:
         # could be connecting via a unix domain socket
-        logger.debug("failed to resolve DB host '%s' due to socket.gaierror(%s). falling back to agent hostname: %s",
-                     db_host, e, agent_hostname)
+        logger.debug(
+            "failed to resolve DB host '%s' due to socket.gaierror(%s). falling back to agent hostname: %s",
+            db_host,
+            e,
+            agent_hostname,
+        )
         return agent_hostname
 
     try:
@@ -116,7 +107,11 @@ def resolve_db_host(db_host):
         if agent_host_ip == host_ip:
             return agent_hostname
     except socket.gaierror as e:
-        logger.debug("failed to resolve agent host '%s' due to socket.gaierror(%s). using DB host: %s",
-                     agent_hostname, e, db_host)
+        logger.debug(
+            "failed to resolve agent host '%s' due to socket.gaierror(%s). using DB host: %s",
+            agent_hostname,
+            e,
+            db_host,
+        )
 
     return db_host
