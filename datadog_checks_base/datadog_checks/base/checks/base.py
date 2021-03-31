@@ -517,6 +517,13 @@ class AgentCheck(object):
 
         aggregator.submit_event_platform_event(self, self.check_id, rawEvent, "dbm-samples")
 
+    def database_monitoring_query_metrics(self, rawEvent):
+        # type: (str) -> None
+        if rawEvent is None:
+            return
+
+        aggregator.submit_event_platform_event(self, self.check_id, rawEvent, "dbm-metrics")
+
     def _submit_metric(
         self, mtype, name, value, tags=None, hostname=None, device_name=None, raw=False, flush_first_value=False
     ):
