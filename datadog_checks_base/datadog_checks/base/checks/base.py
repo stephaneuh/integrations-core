@@ -515,7 +515,7 @@ class AgentCheck(object):
         if rawEvent is None:
             return
 
-        aggregator.submit_event_platform_event(self, self.check_id, rawEvent, "dbm-sample")
+        aggregator.submit_event_platform_event(self, self.check_id, rawEvent, "dbm-samples")
 
     def _submit_metric(
         self, mtype, name, value, tags=None, hostname=None, device_name=None, raw=False, flush_first_value=False
